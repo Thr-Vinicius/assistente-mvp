@@ -1,0 +1,19 @@
+# venv / cache
+.venv/
+__pycache__/
+*.pyc
+
+# banco e dados locais
+assist.db
+*.db
+*.sqlite
+*.sqlite3
+
+# sons locais (opcional: se você quiser versionar o beep, remova isso)
+sounds/*.wav
+
+# logs e temporários
+*.log
+*.tmp
+*~
+.DS_Store

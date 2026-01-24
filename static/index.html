@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Assistente (MVP)</title>
+  <style>
+    :root{
+      --bg1:#0d0f12;
+      --bg2:#141820;
+      --card:#141a22cc;
+      --border:#2a303a;
+      --text:#e9eef6;
+      --muted:#aeb6c4;
+      --btn:#2b3340;
+      --btn2:#3a4455;
+      --ok:#3ddc97;
+      --bad:#ff5b5b;
+      --shadow: 0 10px 40px rgba(0,0,0,.35);
+      --radius: 14px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 50% 0%, rgba(255,255,255,.06), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      padding: 28px 14px 40px;
+    }
+
+    .wrap{
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    header{
+      margin: 6px 0 18px;
+    }
+    h1{
+      margin:0 0 6px;
+      font-size: 34px;
+      letter-spacing: .2px;
+    }
+    .sub{
+      color:var(--muted);
+      font-size: 13px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .pill{
+      border:1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .status{
+      margin-top:10px;
+      font-size: 13px;
+      min-height: 18px;
+      color: var(--muted);
+    }
+    .status.ok{ color: var(--ok); }
+    .status.bad{ color: var(--bad); }
+
+    .grid{
+      display:grid;
+      gap:14px;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2{
+      margin:0 0 12px;
+      font-size: 20px;
+    }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .row.spread{
+      justify-content: space-between;
+    }
+
+    input, select, textarea{
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 10px;
+      border-radius: 10px;
+      outline: none;
+      width: 100%;
+      font-size: 14px;
+    }
+    input::placeholder, textarea::placeholder{ color:#7f8897; }
+
+    textarea{ resize: vertical; }
+
+    .btn{
+      background: var(--btn);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ background: var(--btn2); }
+    .btn:active{ transform: translateY(1px); }
+
+    .btn.small{ padding: 7px 10px; font-size: 12px; border-radius: 9px; }
+    .btn.ghost{ background: transparent; }
+
+    .two{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      width:100%;
+    }
+    @media (max-width:720px){
+      .two{ grid-template-columns: 1fr; }
+      h1{ font-size:28px; }
+    }
+
+    .out{
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px dashed rgba(255,255,255,.10);
+      border-radius: 12px;
+      color: var(--text);
+      background: rgba(0,0,0,.15);
+      white-space: pre-wrap;
+      min-height: 42px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+
+    .hint{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .sep{
+      height:1px;
+      background: rgba(255,255,255,.06);
+      margin: 12px 0;
+    }
+
+    .w-60{ width:60%; }
+    .w-40{ width:40%; }
+    .w-30{ width:30%; }
+    .w-20{ width:20%; }
+    .w-auto{ width:auto; }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Assistente (MVP)</h1>
+      <div class="sub">
+        <span>Acesso via Tailscale. Botões = zero erro.</span>
+        <span class="pill" id="apiPill">API: (auto)</span>
+      </div>
+      <div class="status" id="statusLine"></div>
+    </header>
+
+    <div class="grid">
+
+      <!-- Clima -->
+      <section class="card">
+        <h2>Clima</h2>
+        <div class="row">
+          <button class="btn small" id="btnWeather">Clima de Hoje</button>
+        </div>
+        <div class="out" id="outWeather">—</div>
+        <div class="hint">Mostra temperatura, chance de chuva e vento (Londrina).</div>
+      </section>
+
+      <!-- Tarefas -->
+      <section class="card">
+        <h2>Tarefas</h2>
+        <div class="row">
+          <button class="btn small" id="btnTaskHigh">Ver Alta</button>
+          <button class="btn small" id="btnTaskMed">Ver Média</button>
+          <button class="btn small" id="btnTaskLow">Ver Baixa</button>
+          <button class="btn small" id="btnTaskAll">Ver Todas</button>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="row">
+          <input id="taskText" placeholder="Nova tarefa..." />
+          <select id="taskPriority" class="w-20">
+            <option value="high">Alta</option>
+            <option value="med" selected>Média</option>
+            <option value="low">Baixa</option>
+          </select>
+          <button class="btn" id="btnTaskAdd">Adicionar</button>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <input id="taskDoneId" placeholder="ID p/ concluir (ex.: 3)" class="w-60" />
+          <button class="btn" id="btnTaskDone">Concluir</button>
+        </div>
+
+        <div class="out" id="outTasks">—</div>
+        <div class="hint">Dica: conclua pelo ID. Tarefas concluídas são apagadas automaticamente em 3 dias.</div>
+      </section>
+
+      <!-- Lembretes -->
+      <section class="card">
+        <h2>Lembretes</h2>
+
+        <div class="two">
+          <div>
+            <label class="hint">Data</label>
+            <input id="remDate" type="date" />
+          </div>
+          <div>
+            <label class="hint">Hora</label>
+            <input id="remTime" type="time" />
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label class="hint">Texto do lembrete</label>
+          <input id="remText" placeholder="Ex.: Beber água" />
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn small" id="btnRemCreate">Criar</button>
+          <button class="btn small" id="btnRemList">Listar</button>
+          <button class="btn small" id="btnBeep">Testar beep</button>
+        </div>
+
+        <div class="row" style="margin-top:10px;">
+          <input id="remDelId" placeholder="ID para remover (ex.: 3)" class="w-60" />
+          <button class="btn" id="btnRemDelete">Remover</button>
+        </div>
+
+        <div class="out" id="outReminders">—</div>
+        <div class="hint">Se algo não atualizar, aperte F5.</div>
+      </section>
+
+      <!-- Outros (IA) -->
+      <section class="card">
+        <h2>Outros (IA)</h2>
+        <textarea id="aiText" rows="4" placeholder="Escreva sua dúvida aqui... (isso NÃO vai pro servidor)"></textarea>
+        <div class="row" style="margin-top:10px;">
+          <button class="btn small" id="btnCopyAi">Copiar</button>
+          <button class="btn small" id="btnOpenChatGPT">Abrir ChatGPT</button>
+        </div>
+        <div class="hint">Dica: copie e cole no ChatGPT. Sem chave/API no servidor.</div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    // ===== API base =====
+    // Usando a mesma origem do site (ideal via Tailscale + MagicDNS)
+    const API = location.origin;
+    const apiPill = document.getElementById("apiPill");
+    apiPill.textContent = "API: " + API;
+
+    // ===== Helpers =====
+    const statusLine = document.getElementById("statusLine");
+
+    function setStatus(msg, ok=true){
+      statusLine.textContent = msg;
+      statusLine.className = "status " + (ok ? "ok" : "bad");
+      setTimeout(() => { statusLine.className = "status"; }, 2500);
+    }
+
+    async function apiGet(path){
+      const r = await fetch(API + path, { method: "GET" });
+      const t = await r.text();
+      if(!r.ok) throw new Error(t || (r.status + " " + r.statusText));
+      return t;
+    }
+
+    async function apiPost(path, bodyObj){
+      const r = await fetch(API + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bodyObj || {})
+      });
+      const t = await r.text();
+      if(!r.ok) throw new Error(t || (r.status + " " + r.statusText));
+      return t;
+    }
+
+    // ===== Clima =====
+    const outWeather = document.getElementById("outWeather");
+    document.getElementById("btnWeather").onclick = async () => {
+      try{
+        outWeather.textContent = "Carregando...";
+        const t = await apiGet("/api/weather");
+        outWeather.textContent = t || "—";
+        setStatus("OK ✓");
+      }catch(e){
+        outWeather.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    };
+
+    // ===== Tarefas =====
+    const outTasks = document.getElementById("outTasks");
+    const taskText = document.getElementById("taskText");
+    const taskPriority = document.getElementById("taskPriority");
+    const taskDoneId = document.getElementById("taskDoneId");
+
+    async function loadTasks(priority){
+      try{
+        outTasks.textContent = "Carregando...";
+        const q = priority ? ("?priority=" + encodeURIComponent(priority)) : "";
+        const t = await apiGet("/api/tasks" + q);
+        outTasks.textContent = t || "—";
+        setStatus("OK ✓");
+      }catch(e){
+        outTasks.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    }
+
+    document.getElementById("btnTaskHigh").onclick = () => loadTasks("high");
+    document.getElementById("btnTaskMed").onclick  = () => loadTasks("med");
+    document.getElementById("btnTaskLow").onclick  = () => loadTasks("low");
+    document.getElementById("btnTaskAll").onclick  = () => loadTasks("");
+
+    document.getElementById("btnTaskAdd").onclick = async () => {
+      const text = (taskText.value || "").trim();
+      const pr = taskPriority.value;
+      if(!text){ setStatus("Digite a tarefa.", false); return; }
+      try{
+        const t = await apiPost("/api/tasks", { text, priority: pr });
+        outTasks.textContent = t || "—";
+        taskText.value = "";
+        taskText.focus();
+        setStatus("Tarefa adicionada ✓");
+      }catch(e){
+        outTasks.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    };
+
+    // Enter no input de tarefa adiciona
+    taskText.addEventListener("keydown", (ev) => {
+      if(ev.key === "Enter"){
+        ev.preventDefault();
+        document.getElementById("btnTaskAdd").click();
+      }
+    });
+
+    document.getElementById("btnTaskDone").onclick = async () => {
+      const id = parseInt((taskDoneId.value || "").trim(), 10);
+      if(!Number.isFinite(id)){ setStatus("ID inválido.", false); return; }
+      try{
+        const t = await apiPost("/api/tasks/done", { id });
+        outTasks.textContent = t || "—";
+        taskDoneId.value = "";
+        setStatus("Concluída ✓");
+      }catch(e){
+        outTasks.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    };
+
+    // ===== Lembretes =====
+    const outRem = document.getElementById("outReminders");
+    const remDate = document.getElementById("remDate");
+    const remTime = document.getElementById("remTime");
+    const remText = document.getElementById("remText");
+    const remDelId = document.getElementById("remDelId");
+
+    // default: hoje e hora atual + 2 min (pra facilitar teste)
+    (function initDefaults(){
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2,"0");
+      const yyyy = now.getFullYear();
+      const mm = pad(now.getMonth()+1);
+      const dd = pad(now.getDate());
+      remDate.value = `${yyyy}-${mm}-${dd}`;
+
+      now.setMinutes(now.getMinutes()+2);
+      remTime.value = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    })();
+
+    async function listReminders(){
+      try{
+        outRem.textContent = "Carregando...";
+        const t = await apiGet("/api/reminders");
+        outRem.textContent = t || "—";
+        setStatus("OK ✓");
+      }catch(e){
+        outRem.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    }
+
+    document.getElementById("btnRemList").onclick = listReminders;
+
+    document.getElementById("btnRemCreate").onclick = async () => {
+      const text = (remText.value || "").trim();
+      const when_date = (remDate.value || "").trim();
+      const when_time = (remTime.value || "").trim();
+
+      if(!text){ setStatus("Digite o texto do lembrete.", false); return; }
+      if(!when_date || !when_time){ setStatus("Preencha data e hora.", false); return; }
+
+      try{
+        const t = await apiPost("/api/reminders", { text, when_date, when_time });
+        outRem.textContent = t || "—";
+        remText.value = "";
+        remText.focus();
+        setStatus("Lembrete criado ✓");
+      }catch(e){
+        outRem.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    };
+
+    document.getElementById("btnRemDelete").onclick = async () => {
+      const id = parseInt((remDelId.value || "").trim(), 10);
+      if(!Number.isFinite(id)){ setStatus("ID inválido.", false); return; }
+      try{
+        const t = await apiPost("/api/reminders/delete", { id });
+        outRem.textContent = t || "—";
+        remDelId.value = "";
+        setStatus("Removido ✓");
+      }catch(e){
+        outRem.textContent = String(e);
+        setStatus("Erro: " + e.message, false);
+      }
+    };
+
+    document.getElementById("btnBeep").onclick = async () => {
+      try{
+        const t = await apiPost("/api/beep", {});
+        setStatus(t || "Beep ✓");
+      }catch(e){
+        setStatus("Erro: " + e.message, false);
+      }
+    };
+
+    // ===== Outros (IA) - local-only =====
+    const aiText = document.getElementById("aiText");
+    document.getElementById("btnCopyAi").onclick = async () => {
+      try{
+        await navigator.clipboard.writeText(aiText.value || "");
+        setStatus("Copiado ✓");
+      }catch(e){
+        setStatus("Não consegui copiar (perm.)", false);
+      }
+    };
+    document.getElementById("btnOpenChatGPT").onclick = () => {
+      window.open("https://chatgpt.com", "_blank", "noopener,noreferrer");
+    };
+
+    // Carrega tarefas/lembretes ao abrir
+    loadTasks("");
+    listReminders();
+  </script>
+</body>
+</html>
