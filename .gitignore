@@ -1,9 +1,32 @@
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtualenv
 .venv/
 venv/
+ENV/
+env/
+
+# Environment / secrets
 .env
-*.log
-.cache/
+.env.*
+*.pem
+id_ed25519*
+*.key
+
+# Databases / runtime files
 *.db
 *.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
