@@ -1,20 +1,30 @@
 # assistente-mvp
 
-Painel web simples para **tarefas**, **lembretes com som (chime)** e **clima (Londrina-PR)**, feito para rodar em HomeLab com baixo consumo.
+Painel web leve para **tarefas**, **lembretes com som (chime/beep)** e **clima** (Londrina-PR), pensado para rodar em um **HomeLab de baixo consumo**.
 
-- Backend: FastAPI + SQLite
-- Frontend: HTML/CSS/JS (sem framework)
-- Acesso recomendado: Tailscale + MagicDNS
-- Lembretes: disparam um som no **servidor**
+- **Backend:** FastAPI + SQLite
+- **Frontend:** HTML/CSS/JS (sem framework)
+- **Acesso remoto recomendado:** Tailscale + MagicDNS
+- **Lembretes:** disparam áudio no servidor (beep/chime)
 
-## O que tem
+## Funcionalidades
+
 - ✅ Clima do dia (Open-Meteo)
 - ✅ Tarefas por prioridade (Alta / Média / Baixa)
 - ✅ Concluir tarefas (auto-limpeza em 3 dias)
 - ✅ Lembretes com data/hora + beep/chime no servidor
 - ✅ Botão para copiar texto e abrir o ChatGPT (sem API no servidor)
 
+## Por que este projeto existe
+
+Este projeto foi feito como um MVP para meu HomeLab, com foco em:
+- simplicidade (sem dependências pesadas no frontend),
+- baixo consumo,
+- implantação prática (execução via Uvicorn / systemd),
+- e boas práticas básicas (segredos fora do repositório, `.gitignore` bem definido).
+
 ## Como rodar (rápido)
+
 ```bash
 cd /opt/assist
 python3 -m venv .venv
