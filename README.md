@@ -83,14 +83,16 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 
 Este projeto foi desenvolvido com forte auxílio de ferramentas de IA durante meu processo de aprendizado.
 
-Meu objetivo não foi demonstrar domínio completo das tecnologias utilizadas, mas compreender conceitos relacionados a:
+O objetivo principal não foi criar um produto final ou um sistema para produção, mas explorar conceitos relacionados a:
 
-* Python
-* APIs
-* FastAPI
-* SQLite
-* Linux
-* Automação
-* Desenvolvimento de aplicações web
+- Python
+- APIs
+- FastAPI
+- SQLite
+- Linux
+- Automação
+- Desenvolvimento web
 
-Pretendo continuar evoluindo o projeto e assumir gradualmente mais decisões de implementação conforme meus conhecimentos avançam.
+Durante o desenvolvimento, pude ter contato com configuração de ambiente Linux, gerenciamento de dependências, integração com APIs, estruturação de aplicações web e uso de Git/GitHub.
+
+O projeto permanece disponível como registro do meu aprendizado e da minha evolução técnica.
